@@ -1,0 +1,35 @@
+from PIL import Image
+import random
+import hashlib
+
+def generate_random_number_from_image(image_path, min_value=0, max_value=100):
+    """
+    Génère un nombre aléatoire à partir de l'entropie d'une image.
+
+    :param image_path: Chemin de l'image utilisée pour générer l'entropie.
+    :param min_value: Valeur minimale du nombre aléatoire.
+    :param max_value: Valeur maximale du nombre aléatoire.
+    :return: Nombre aléatoire basé sur l'image.
+    """
+    # Ouvrir l'image
+    img = Image.open(image_path)
+    # Convertir l'image en niveaux de gris pour simplifier le traitement
+    img = img.convert('L')  
+    # Récupérer les pixels de l'image
+    pixels = list(img.getdata())
+    
+    # Calculer un hachage des données des pixels
+    pixel_data = ''.join(map(str, pixels)).encode('utf-8')
+    hash_value = hashlib.sha256(pixel_data).hexdigest()
+    
+    # Utiliser le hachage pour générer un nombre aléatoire
+    seed = int(hash_value, 16)  # Convertir le hachage en entier
+    random.seed(seed)
+    random_number = random.randint(min_value, max_value)
+    
+    return random_number
+
+# Exemple d'utilisation
+image_path = "your_image.jpg"  # Remplacez par le chemin de votre image
+random_number = generate_random_number_from_image(image_path, min_value=1, max_value=1000)
+print(f"Nombre aléatoire généré : {random_number}")
