@@ -1,35 +1,87 @@
 from PIL import Image
-import random
 import hashlib
+import os
+import argparse
 
-def generate_random_number_from_image(image_path, min_value=0, max_value=100):
+def generate_large_number_from_image(image_path, image_size=(100, 100), num_length=20):
     """
-    Génère un nombre aléatoire à partir de l'entropie d'une image.
-
+    Génère un grand nombre à partir de l'entropie d'une image, basé sur un hachage de ses pixels.
+    
     :param image_path: Chemin de l'image utilisée pour générer l'entropie.
-    :param min_value: Valeur minimale du nombre aléatoire.
-    :param max_value: Valeur maximale du nombre aléatoire.
-    :return: Nombre aléatoire basé sur l'image.
+    :param image_size: Tuple indiquant la taille à laquelle redimensionner l'image (largeur, hauteur).
+    :param num_length: Longueur du nombre généré (en chiffres).
+    :return: Nombre généré sous forme de chaîne de caractères ou None si une erreur survient.
     """
-    # Ouvrir l'image
-    img = Image.open(image_path)
-    # Convertir l'image en niveaux de gris pour simplifier le traitement
-    img = img.convert('L')  
-    # Récupérer les pixels de l'image
-    pixels = list(img.getdata())
-    
-    # Calculer un hachage des données des pixels
-    pixel_data = ''.join(map(str, pixels)).encode('utf-8')
-    hash_value = hashlib.sha256(pixel_data).hexdigest()
-    
-    # Utiliser le hachage pour générer un nombre aléatoire
-    seed = int(hash_value, 16)  # Convertir le hachage en entier
-    random.seed(seed)
-    random_number = random.randint(min_value, max_value)
-    
-    return random_number
+    try:
+        # Vérifier si le fichier existe
+        if not os.path.exists(image_path):
+            raise FileNotFoundError(f"Le fichier {image_path} n'existe pas.")
+        
+        # Ouvrir l'image et la redimensionner
+        img = Image.open(image_path)
+        img.verify()  # Vérifie si le fichier est une image valide
+        
+        # Réouvrir l'image pour traitement
+        img = Image.open(image_path)
+        
+        # Redimensionner l'image à la taille spécifiée
+        img = img.resize(image_size)
+        
+        # Convertir l'image en niveaux de gris
+        img = img.convert('L')
+        
+        # Récupérer les pixels
+        pixels = list(img.getdata())
+        
+        # Calculer un hachage des données des pixels
+        pixel_data = ''.join(map(str, pixels)).encode('utf-8')
+        hash_value = hashlib.sha256(pixel_data).hexdigest()
+        
+        # Utiliser le hachage pour générer un nombre à partir du hachage
+        long_number = int(hash_value, 16)  # Convertir le hachage en entier
 
-# Exemple d'utilisation
-image_path = "your_image.jpg"  # Remplacez par le chemin de votre image
-random_number = generate_random_number_from_image(image_path, min_value=1, max_value=1000)
-print(f"Nombre aléatoire généré : {random_number}")
+        # Générer un nombre de la longueur souhaitée
+        large_number = str(long_number)[:num_length].ljust(num_length, '0')  
+        
+        return large_number
+    except FileNotFoundError as e:
+        print(f"Erreur de fichier : {e}")
+    except ValueError as e:
+        print(f"Erreur de format d'image : {e}")
+    except Exception as e:
+        print(f"Erreur inconnue : {e}")
+    
+    return None
+
+def parse_args():
+    """
+    Analyse les arguments en ligne de commande.
+    """
+    parser = argparse.ArgumentParser(
+        description="Génère un grand nombre à partir de l'entropie d'une image."
+    )
+    
+    # Ajout des arguments
+    parser.add_argument('image_path', type=str, help="Chemin vers l'image qui doit etre dans le meme dossier que le script.")
+    parser.add_argument('--size', type=int, nargs=2, default=[100, 100],
+                        help="Taille de l'image (largeur, hauteur) pour redimensionner l'image.")
+    parser.add_argument('--length', type=int, default=20, help="Longueur du nombre à généré.")
+    
+    return parser.parse_args()
+
+def main():
+    """
+    Exemple d'exécution de la fonction avec des arguments en ligne de commande.
+    """
+    # Parser les arguments
+    args = parse_args()
+    
+    # Appel de la fonction avec les arguments fournis
+    result = generate_large_number_from_image(args.image_path, tuple(args.size), args.length)
+    if result is not None:
+        print(f"Nombre généré : {result}")
+    else:
+        print("Échec de la génération du nombre.")
+
+if __name__ == "__main__":
+    main()
