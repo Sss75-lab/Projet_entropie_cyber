@@ -1,124 +1,137 @@
-### **README : Génération de nombres basés sur l'entropie d'une image**
+## **README - Génération de Nombres Basés sur l'Entropie d'une Image**
 
 ---
 
-## **Description**
-Ce script Python permet de générer un **grand nombre entier** basé sur l'entropie d'une image en :
-1. Transformant l'image en données de pixels.
-2. Calculant un hachage cryptographique unique (SHA-256) de ces données.
-3. Produisant un nombre d'une longueur spécifiée à partir de ce hachage.
+### **Description**
 
-Le script prend en charge des **arguments en ligne de commande** pour personnaliser le chemin de l'image, les dimensions de redimensionnement, et la longueur du nombre généré.
+Ce script Python génère un grand nombre entier basé sur l'entropie d'une image. L'entropie est extraite en calculant un hachage cryptographique (SHA-256) des pixels de l'image redimensionnée. Ce nombre peut être utilisé comme source d'entropie pour des applications en cybersécurité, comme la génération de clés, d'identifiants uniques ou de graines pour des générateurs de nombres pseudo-aléatoires.
 
 ---
 
-## **Utilité dans la cybersécurité**
-Ce code peut être utilisé pour **générer des nombres uniques et reproductibles** à partir d'une image. Ces nombres peuvent servir dans divers contextes de cybersécurité, par exemple :
-
-- **Clés de chiffrement** : Générer une clé unique pour protéger des données sensibles.
-- **Jetons d'identification** : Créer des identifiants uniques pour des utilisateurs ou des sessions.
-- **Sources d'entropie** : Fournir une base pour des générateurs de nombres pseudo-aléatoires dans des systèmes sécurisés.
-
-### **Exemple d'application : Génération d'une clé unique**
-Dans un système de chiffrement personnalisé, une image peut servir de "graine" pour générer une clé de chiffrement unique. Tant que la même image est utilisée, la clé peut être reproduite, garantissant une gestion sécurisée sans stocker directement la clé.
+### **Caractéristiques**
+1. **Personnalisable** :
+   - Taille d'image redimensionnée.
+   - Longueur du nombre généré.
+2. **Validation robuste** :
+   - Vérifie que le fichier image existe et est valide.
+3. **Flexibilité** :
+   - Utilise des arguments en ligne de commande pour une configuration facile.
+4. **Sécurité** :
+   - Utilise l'algorithme SHA-256 pour une forte entropie.
 
 ---
 
-## **Prérequis**
-- Python 3.x installé.
+### **Prérequis**
+
+- Python 3.6 ou version ultérieure.
 - Bibliothèques Python requises :
-  - **Pillow** : Pour manipuler les images.
-  - **argparse** : Pour gérer les arguments en ligne de commande (inclus par défaut dans Python).
-  - **hashlib** : Pour calculer les hachages cryptographiques (inclus par défaut dans Python).
+  - **Pillow** : Manipulation d'images.
+  - **argparse** : Gestion des arguments en ligne de commande (inclus dans Python).
+  - **hashlib** : Calcul de hachages cryptographiques (inclus dans Python).
 
-### **Installation des dépendances**
-Si Pillow n'est pas installé, exécutez :
+Pour installer Pillow :
 ```bash
 pip install pillow
 ```
 
 ---
 
-## **Utilisation**
-### **1. Lancer le script**
-Pour exécuter le script, utilisez la commande suivante dans un terminal :
-```bash
-python script.py <chemin_de_l_image> [--size largeur hauteur] [--length longueur]
-```
+### **Utilisation**
 
-### **2. Arguments**
-- **`<chemin_de_l_image>`** (obligatoire) : Spécifie le chemin de l'image à traiter.
-- **`--size largeur hauteur`** (optionnel) : Définit les dimensions de redimensionnement de l'image (par défaut : `100x100`).
-- **`--length longueur`** (optionnel) : Définit la longueur du nombre généré (par défaut : `20`).
-
----
-
-### **3. Exemples**
-
-#### **Exemple 1 : Utilisation de base**
+#### **1. Exécution de base**
+Lancez le script avec le chemin de l'image :
 ```bash
 python script.py image.png
 ```
-- Génère un nombre de 20 chiffres basé sur l'image `image.png`.
+Cela génère un nombre de 20 chiffres basé sur l'image `image.png`.
 
-#### **Exemple 2 : Personnalisation de la taille et de la longueur**
-```bash
-python script.py image.png --size 200 200 --length 50
-```
-- Redimensionne l'image à 200x200 pixels.
-- Génère un nombre de 50 chiffres.
-
-#### **Exemple 3 : Image introuvable**
-Si l'image spécifiée n'existe pas :
-```bash
-python script.py fichier_inexistant.png
-```
-- Affiche : `Erreur de fichier : Le fichier fichier_inexistant.png n'existe pas.`
-
----
-
-## **Sortie**
-- Si l'exécution est réussie, le script affiche un message :
-  ```plaintext
-  Nombre généré : 12345678901234567890
+#### **2. Personnalisation**
+Vous pouvez personnaliser les paramètres avec les options suivantes :
+- **Redimensionner l'image** :
+  ```bash
+  --size LARGEUR HAUTEUR
   ```
-- En cas d'erreur (fichier introuvable, format non valide), le script affiche un message descriptif.
+  Exemple :
+  ```bash
+  python script.py image.png --size 200 200
+  ```
 
----
+- **Longueur du nombre généré** :
+  ```bash
+  --length LONGUEUR
+  ```
+  Exemple :
+  ```bash
+  python script.py image.png --length 30
+  ```
 
-## **Code source**
-```python
-from PIL import Image
-import hashlib
-import os
-import argparse
-
-# Voir le code complet dans le fichier principal
+#### **3. Exemple complet**
+```bash
+python script.py image.png --size 150 150 --length 25
 ```
 
 ---
 
-## **Avantages dans la cybersécurité**
+### **Pourquoi compléter avec des zéros au-delà d'une certaine longueur ?**
 
-### **1. Sources d'entropie uniques**
-En cybersécurité, l'entropie est essentielle pour générer des valeurs aléatoires ou imprévisibles. Ce script exploite les propriétés uniques des pixels d'une image pour garantir que :
-- Chaque image produit un hachage différent.
-- L'entropie est élevée grâce à l'algorithme SHA-256.
+Lorsque la longueur du nombre généré dépasse celle du hachage SHA-256 (64 caractères hexadécimaux = 256 bits), le script :
+1. Tronque le hachage si la longueur demandée est inférieure.
+2. Complète avec des zéros si la longueur demandée est supérieure.
 
-### **2. Génération de clés de chiffrement reproductibles**
-Exemple :
-1. Un utilisateur télécharge une image comme "clé visuelle".
-2. Le script génère une clé unique basée sur cette image.
-3. Tant que l'image d'origine est disponible, la clé peut être recréée pour déchiffrer des données.
+**Exemple** :
+- Hachage généré : `123456789abcdef`.
+- Si la longueur demandée est 20 :
+  - Résultat : `123456789abcdef0000`.
 
----
-
-### **3. Jetons uniques pour l'authentification**
-L'entropie des pixels peut être utilisée pour générer des jetons d'accès ou d'authentification temporaires.
-
-#### Exemple :
-- Un système utilise une image comme entrée pour générer des jetons d'accès uniques, garantissant qu'un jeton ne peut pas être deviné.
+**Raison** :
+- Cela garantit que le résultat a toujours la longueur exacte demandée, ce qui est essentiel dans certaines applications où une longueur fixe est nécessaire (par exemple, des identifiants de taille fixe dans une base de données).
 
 ---
 
-Avec ce script, vous avez un outil flexible, sécurisé et facile à utiliser pour tirer parti des images comme sources d'entropie en cybersécurité. 😊
+### **Utilité du Code en Cybersécurité**
+
+Ce script est utile dans des cas où une source d'entropie unique est nécessaire. Voici quelques exemples :
+
+#### **1. Génération de clés cryptographiques**
+- Les clés de chiffrement nécessitent une entropie élevée pour être imprévisibles.
+- Ce script transforme une image en une source d'entropie robuste grâce à SHA-256.
+- Exemple :
+  - Une organisation peut générer des clés symétriques basées sur des images aléatoires capturées par une caméra.
+
+#### **2. Génération de graines pour des RNG (Random Number Generators)**
+- Les RNG cryptographiques utilisent des graines (entropie initiale) pour produire des séquences aléatoires.
+- Ce script peut fournir une graine basée sur une image unique, garantissant une forte imprévisibilité.
+
+#### **3. Création d'ID uniques**
+- Dans certaines bases de données ou systèmes, des identifiants uniques longs sont nécessaires.
+- Ce script peut générer des ID en utilisant une image, assurant leur unicité.
+
+---
+
+### **Exemple d'application en cybersécurité**
+Une entreprise de sécurité développe un système pour sécuriser les appareils IoT. Chaque appareil est configuré avec une clé cryptographique unique. Plutôt que d'utiliser des générateurs standards, l'entreprise capture une image aléatoire pendant la configuration (par exemple, une photo de l'environnement de l'appareil) et utilise ce script pour générer une clé unique. Cela ajoute un niveau de sécurité basé sur l'entropie visuelle.
+
+---
+
+### **Structure du Code**
+
+1. **`generate_large_number_from_image`** :
+   - Génère le grand nombre à partir d'une image.
+2. **`parse_args`** :
+   - Analyse les arguments de ligne de commande.
+3. **`main`** :
+   - Point d'entrée du script.
+
+---
+
+### **Notes importantes**
+1. **Images recommandées** :
+   - Utilisez des images variées et aléatoires pour maximiser l'entropie.
+2. **Limitation de la longueur** :
+   - Bien que la longueur puisse être augmentée, des longueurs très élevées peuvent diluer l'entropie réelle en ajoutant des zéros inutiles.
+
+---
+
+### **Auteur**
+
+Ce script a été conçu pour fournir une source flexible et sécurisée d'entropie basée sur des images. Pour toute question ou amélioration, contactez l'auteur. 😊
